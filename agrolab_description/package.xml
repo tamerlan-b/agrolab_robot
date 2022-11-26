@@ -1,0 +1,20 @@
+<package>
+  <name>agrolab_description</name>
+  <version>0.5.0</version>
+
+  <description>This package contains a agrolab URDF.</description>
+  <author email="artpesh2012@yandex.ru">Peshnin A.</author>
+
+  <maintainer email="artpesh2012@yandex.ru">Peshnin A.</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>joint_state_publisher_gui</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>xacro</run_depend>
+
+</package>
