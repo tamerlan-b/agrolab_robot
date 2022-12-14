@@ -1,0 +1,19 @@
+agrolab:
+    - joint_state_controller:
+        type: joint_state_controller/JointStateController
+        publish_rate: 20
+
+    - base_link_to_x_controller:
+        type: position_controllers/JointPositionController
+        joint: base_link_to_X
+        pid: {p: 1000.0, i: 0.01, d: 0.0}
+    
+    - x_to_y_controller:
+        type: position_controllers/JointPositionController
+        joint: X_to_Y
+        pid: {p: 1000.0, i: 0.01, d: 0.0}
+
+    - y_to_z_controller:
+        type: position_controllers/JointPositionController
+        joint: Y_to_Z
+        pid: {p: 1000.0, i: 0.01, d: 0.0}
