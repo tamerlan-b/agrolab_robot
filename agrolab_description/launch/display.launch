@@ -1,18 +1,31 @@
 <launch>
-
   <arg name="model" default="$(find agrolab_description)/urdf/agrolab.urdf"/>
   <arg name="gui" default="true" />
   <arg name="rvizconfig" default="$(find agrolab_description)/rviz/urdf.rviz" />
 
+  <!-- Запускаем gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  </include>
+
   <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
 
-  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-  <!-- <node name="agrolab_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model agrolab" /> -->
+  <!-- Загружаем параметры -->
+  <rosparam file="$(find agrolab_description)/config/config.yaml" command="load"/>
 
-  <!-- <node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
-  <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> -->
+  <!-- Создаем робота в gazebo -->
+  <node name="agrolab_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
+    args="-urdf -param robot_description -model agrolab" />
+
+   <!-- Запускаем контроллеры -->
+   <node name="controller_spawner_agrolab" pkg ="controller_manager" type="spawner" respawn="false" output="screen"
+ ns="/" args="joint_state_controller base_link_to_x_controller x_to_y_controller y_to_z_controller"/>
+
+  <node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
 
 </launch>
