@@ -1,6 +1,41 @@
 <?xml version="1.0"?>
-<robot name="agrolab">
-  
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="agrolab">
+    
+
+  <xacro:property name="base_link_to_x" value="base_link_to_X" />
+  <xacro:property name="x_to_y" value="X_to_Y" />
+  <xacro:property name="y_to_z" value="Y_to_Z" />
+
+  <transmission name="${base_link_to_x}_tran">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${base_link_to_x}">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${base_link_to_x}_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterfacee</hardwareInterface>
+		</actuator>
+	</transmission>
+
+  <transmission name="${x_to_y}_tran">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${x_to_y}">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${x_to_y}_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterfacee</hardwareInterface>
+		</actuator>
+	</transmission>
+
+  <transmission name="${y_to_z}_tran">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="${y_to_z}">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="${y_to_z}_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterfacee</hardwareInterface>
+		</actuator>
+	</transmission>
+
     <link name="base_link">
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -134,38 +169,46 @@
     </inertial>
     </link>      
 
-    <joint name="base_link_to_light" type="fixed">
+  <joint name="base_link_to_light" type="fixed">
     <parent link="base_link"/>
     <child link="Light"/>
   </joint>
   
-    <joint name="base_link_to_water_tank" type="fixed">
+  <joint name="base_link_to_water_tank" type="fixed">
     <parent link="base_link"/>
     <child link="Water_tank"/>
   </joint>  
   
-    <joint name="base_link_to_stand" type="fixed">
+  <joint name="base_link_to_stand" type="fixed">
     <parent link="base_link"/>
     <child link="Stand"/>
   </joint>  
         
-    <joint name="base_link_to_X" type="prismatic">
+  <joint name="${base_link_to_x}" type="prismatic">
     <parent link="base_link"/>
     <child link="X"/>
     <axis xyz="1 0 0" />
     <limit effort="10000" lower="0" upper="0.43" velocity="1" />
   </joint>
   
-    <joint name="X_to_Y" type="prismatic">
+  <joint name="${x_to_y}" type="prismatic">
     <parent link="X"/>
     <child link="Y"/>
     <axis xyz="0 1 0" />
     <limit effort="10000" lower="0" upper="0.54" velocity="1" />
   </joint>   
-      <joint name="Y_to_Z" type="prismatic">
+  
+  <joint name="${y_to_z}" type="prismatic">
     <parent link="Y"/>
     <child link="Z"/>
     <axis xyz="0 0 -1" />
     <limit effort="10000" lower="0" upper="0.2" velocity="1" />
-  </joint>       
+  </joint>
+
+  <!-- Gazebo plugin for ROS Control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
 </robot>
