@@ -3,6 +3,7 @@ project(agrolab_description)
 
 find_package(catkin REQUIRED COMPONENTS
         rospy
+        roslint
         std_msgs
         sensor_msgs
         geometry_msgs)
