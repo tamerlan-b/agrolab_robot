@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="agrolab_controller" name="search_node" type="search_node.py" output="screen">
+    </node>
+</launch>
