@@ -2,6 +2,7 @@
 
 import rospy
 import smach
+import smach_ros
 
 # define state Foo
 class Foo(smach.State):
@@ -46,8 +47,14 @@ def main():
         smach.StateMachine.add('BAR', Bar(), 
                                transitions={'outcome2':'FOO'})
 
+    sis = smach_ros.IntrospectionServer('agrolab', sm, '/SM_ROOT')
+    sis.start()
+
     # Execute SMACH plan
     outcome = sm.execute()
+
+    rospy.spin()
+    sis.stop()
 
 
 if __name__ == '__main__':

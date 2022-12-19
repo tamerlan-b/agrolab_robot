@@ -1,3 +1,7 @@
 <launch>
     <node pkg="state_machine" type="state_machine_node.py" name="state_machine" output="screen"/>
+
+    <!-- Визуализация машины состояний -->
+    <node pkg="smach_viewer" type="smach_viewer.py" name="smach_viewer" output="log"/>
+
 </launch>
