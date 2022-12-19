@@ -19,7 +19,7 @@ class Searcher:
         self.y: float = 0                           # Текущая координата по у
         self.z: float = 0.15                        # Текущая координата по z
 
-        self.searching_in_process: bool = True      # Если флаг True, то идет поиск, если False - робот стоит на месте
+        self.searching_in_process: bool = False      # Если флаг True, то идет поиск, если False - робот стоит на месте
 
         speed: int = 2                              # Скорость робота (коэффициент)
         self.x_path_delta = 0.03                    # Участок пути по х, который робот проходит за один прогон
