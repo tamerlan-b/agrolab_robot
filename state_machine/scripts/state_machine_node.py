@@ -4,53 +4,71 @@ import rospy
 import smach
 import smach_ros
 
-# define state Foo
-class Foo(smach.State):
+
+class WaitState(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['outcome1','outcome2'])
-        self.counter = 0
+        smach.State.__init__(self, outcomes=['start'])
 
     def execute(self, userdata):
-        rospy.loginfo('Executing state FOO')
-        if self.counter < 3:
-            self.counter += 1
-            return 'outcome1'
-        else:
-            return 'outcome2'
+        rospy.sleep(2.0)
+        return 'start'
 
-
-# define state Bar
-class Bar(smach.State):
+class SearchState(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['outcome2'])
+        smach.State.__init__(self, outcomes=['find_object', 'stop'])
 
     def execute(self, userdata):
-        rospy.loginfo('Executing state BAR')
-        return 'outcome2'
-        
+        rospy.sleep(2.0)
+        return 'find_object'
 
+class GrabState(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['grabbed'])
+
+    def execute(self, userdata):
+        rospy.sleep(2.0)
+        return 'grabbed'
+
+class MoveState(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['released'])
+
+    def execute(self, userdata):
+        rospy.sleep(2.0)
+        return 'released'
+
+class ReturnHomeState(smach.State):
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['homed'])
+
+    def execute(self, userdata):
+        rospy.sleep(2.0)
+        return 'homed'
 
 
 # main
 def main():
-    rospy.init_node('smach_example_state_machine')
+    rospy.init_node('state_machine_node')
 
-    # Create a SMACH state machine
-    sm = smach.StateMachine(outcomes=['outcome4', 'outcome5'])
+    # Создаем машину состояний
+    sm = smach.StateMachine(outcomes=['finished'])
 
-    # Open the container
+    # Добавляем состояния
     with sm:
-        # Add states to the container
-        smach.StateMachine.add('FOO', Foo(), 
-                               transitions={'outcome1':'BAR', 
-                                            'outcome2':'outcome4'})
-        smach.StateMachine.add('BAR', Bar(), 
-                               transitions={'outcome2':'FOO'})
 
+        smach.StateMachine.add('Wait', WaitState(), transitions={'start':'Search'})
+        smach.StateMachine.add('Search', SearchState(), transitions={
+                                                                    'find_object':'Grab', 
+                                                                    'stop':'Wait'})
+        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move'})
+        smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome'})
+        smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search'})
+
+    # Визуализируем состояния
     sis = smach_ros.IntrospectionServer('agrolab', sm, '/SM_ROOT')
     sis.start()
 
-    # Execute SMACH plan
+    # Запускаем машину состояний
     outcome = sm.execute()
 
     rospy.spin()
