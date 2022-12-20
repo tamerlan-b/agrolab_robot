@@ -28,6 +28,8 @@ class WaitState(smach.State):
     def execute(self, userdata):
         rospy.sleep(2.0)
         if self.start_fsm:
+            # Сбрасываем переменную
+            self.start_fsm = False
             try:
                 # Запускаем поиск объекта
                 resp: TriggerResponse = self.start_search_client(TriggerRequest())
@@ -42,12 +44,33 @@ class SearchState(smach.State):
     """
 
     def __init__(self):
+        # Сервис для остановки КА
+        self.stop_fsm_service: rospy.Service = rospy.Service('~stop_fsm', Trigger, self.stop_callback)
+        self.stop_fsm = False
+
+        # Сервис остановки процедуры поиска
+        rospy.wait_for_service('/search_node/stop_searching')
+        self.stop_search_client = rospy.ServiceProxy('/search_node/stop_searching', Trigger)
         smach.State.__init__(self, outcomes=['find_object', 'stop', 'searching'])
+
+    
+    def stop_callback(self, request: TriggerRequest) -> TriggerResponse:
+        self.stop_fsm = True
+        return TriggerResponse()
+
 
     def execute(self, userdata):
         rospy.sleep(2.0)
+        if self.stop_fsm:
+            self.stop_fsm = False
+            try:
+                # Останавливаем поиск объекта
+                resp: TriggerResponse = self.stop_search_client(TriggerRequest())
+            except rospy.ServiceException as e:
+                print("Service call failed: %s"%e)
+            return 'stop'
         return 'searching'
-        return 'find_object'
+        # return 'find_object'
 
 class GrabState(smach.State):
     """Состояние захвата объекта
