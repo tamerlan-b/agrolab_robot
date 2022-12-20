@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from sensor_msgs.msg import Image
+from geometry_msgs.msg import Point
 import cv2
 from cv_bridge import CvBridge
 import numpy as np
@@ -53,7 +54,9 @@ class ColorDetector:
         self.bridge = CvBridge()
         rospy.Subscriber("/agrolabCamera/image_raw", Image, self.callback)
 
-        self.debug_img_pub = rospy.Publisher('~/debug/image', Image, queue_size=10)
+        self.obj_center_pub = rospy.Publisher('~detected_object', Point, queue_size=10)
+
+        self.debug_img_pub = rospy.Publisher('~debug/image', Image, queue_size=10)
 
 
     def callback(self, img: Image):
@@ -61,22 +64,24 @@ class ColorDetector:
         cv_image = self.bridge.imgmsg_to_cv2(img, desired_encoding='passthrough')
         # Находим центры красных объектов
         centers = ImageProcessor.findObjects(cv_image)
+        # print(centers)
 
         # Публикуем центры объектов в топик
-
-        print(centers)
+        for c in centers:
+            p = Point(x=c[0], y=c[1], z=0)
+            self.obj_center_pub.publish(p)
 
         # Визуализируем найденные центры
         cnt_img = cv_image.copy()
         cnt_img = ImageProcessor.drawCenters(cnt_img, centers)
-        debug_img_msg = self.bridge.cv2_to_imgmsg(cnt_img, encoding='rgb8')
-        # debug_img_msg = self.bridge.cv2_to_imgmsg(thresh)
-        debug_img_msg.header = img.header
+        debug_img_msg = self.bridge.cv2_to_imgmsg(cnt_img, encoding='rgb8', header=img.header)
         self.debug_img_pub.publish(debug_img_msg)
         rospy.loginfo("I get image")
     
 def main():    
     rospy.init_node('apple_detector', anonymous=True)
+
+    rospy.loginfo("Apple detector started")
 
     cd = ColorDetector()
 
