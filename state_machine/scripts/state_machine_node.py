@@ -19,7 +19,7 @@ class WaitState(smach.State):
         rospy.wait_for_service('/search_node/start_searching')
         self.start_search_client = rospy.ServiceProxy('/search_node/start_searching', Trigger)
         
-        smach.State.__init__(self, outcomes=['start', 'wait'])
+        smach.State.__init__(self, outcomes=['start', 'remain'])
     
     def start_callback(self, request: TriggerRequest) -> TriggerResponse:
         self.start_fsm = True
@@ -37,7 +37,7 @@ class WaitState(smach.State):
                 print("Service call failed: %s"%e)
             return 'start'
         else:
-            return 'wait'
+            return 'remain'
 
 class SearchState(smach.State):
     """Состояние поиска объекта
@@ -69,7 +69,7 @@ class SearchState(smach.State):
             except rospy.ServiceException as e:
                 print("Service call failed: %s"%e)
             return 'stop'
-        return 'searching'
+        return 'remain'
         # return 'find_object'
 
 class GrabState(smach.State):
@@ -117,11 +117,11 @@ def main():
     with sm:
 
         smach.StateMachine.add('Wait', WaitState(), transitions={'start':'Search',
-                                                                'wait': 'Wait'})
+                                                                'remain': 'Wait'})
         smach.StateMachine.add('Search', SearchState(), transitions={
                                                                     'find_object':'Grab', 
                                                                     'stop':'Wait',
-                                                                    'searching': 'Search'})
+                                                                    'remain': 'Search'})
         smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move'})
         smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome'})
         smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search'})
