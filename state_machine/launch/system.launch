@@ -1,0 +1,10 @@
+<launch>
+    <!-- Запускаем RViz + Gazebo -->
+    <include file="$(find agrolab_description)/launch/display.launch"/>
+
+    <!-- Запускаем узел поиска объекта -->
+    <include file="$(find agrolab_controller)/launch/search_node.launch"/>
+    
+    <!-- Запускаем машину состояний -->
+    <include file="$(find state_machine)/launch/state_machine.launch"/>
+</launch>
