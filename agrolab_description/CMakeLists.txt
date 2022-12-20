@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         geometry_msgs)
 
-roslint_python()
 catkin_package()
 
 if(CATKIN_ENABLE_TESTING)

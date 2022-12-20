@@ -1,31 +1,30 @@
 <launch>
-  <arg name="model" default="$(find agrolab_description)/urdf/agrolab.urdf"/>
-  <arg name="gui" default="true" />
-  <arg name="rvizconfig" default="$(find agrolab_description)/rviz/urdf.rviz" />
 
-  <!-- Запускаем gazebo -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-  </include>
+    <arg name="model" default="$(find agrolab_description)/urdf/agrolab.urdf"/>
+    <arg name="gui" default="false" />
 
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
+    <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
 
-  <!-- Загружаем параметры -->
-  <rosparam file="$(find agrolab_description)/config/config.yaml" command="load"/>
+    <node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+    <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    
+    <!-- <arg name="rvizconfig" default="$(find agrolab_description)/rviz/urdf.rviz" /> -->
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
 
-  <!-- Создаем робота в gazebo -->
-  <node name="agrolab_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
-    args="-urdf -param robot_description -model agrolab" />
+    <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch" /> -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find agrolab_description)/world/apple.world.xml" />
+    </include>
 
-   <!-- Запускаем контроллеры -->
-   <node name="controller_spawner_agrolab" pkg ="controller_manager" type="spawner" respawn="false" output="screen"
- ns="/" args="joint_state_controller base_link_to_x_controller x_to_y_controller y_to_z_controller"/>
+    <node pkg="gazebo_ros" type="spawn_model" name="model" args="-urdf -model test -param robot_description"  />
+    
+    <!-- <node pkg="agrolab_description" type="control.py" name="control" output="screen" />
+    <node pkg="agrolab_description" type="gripper.py" name="gripper" output="screen" /> -->
 
-  <node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
-  <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-
-  <!-- convert joint states to TF transforms for rviz, etc -->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
+    <rosparam file="$(find agrolab_description)/config/config.yaml" command="load"/>
+    <node name="controller_spawner_angle" pkg ="controller_manager" type="spawner" respawn="false" output="screen" 
+    ns="/agrolab" args="joint_state_controller base_link_to_X_controller X_to_Y_controller Y_to_Z_controller 
+    gripper_controller gripper_sub_controller"/>
 
 </launch>
