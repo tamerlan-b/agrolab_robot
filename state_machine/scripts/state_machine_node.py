@@ -6,6 +6,7 @@ import smach_ros
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 from geometry_msgs.msg import Point
 
+state_upd_time = 0.5
 
 class WaitState(smach.State):
     """Состояние ожидания запуска конечного автомата (КА)
@@ -27,7 +28,8 @@ class WaitState(smach.State):
         return TriggerResponse()
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
         if self.start_fsm:
             # Сбрасываем переменную
             self.start_fsm = False
@@ -73,7 +75,8 @@ class SearchState(smach.State):
             print("Service call failed: %s"%e)
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
         
         if self.stop_fsm:
             self.stop_fsm = False
@@ -95,6 +98,8 @@ class GrabState(smach.State):
         smach.State.__init__(self, outcomes=['grabbed', 'remain'])
 
     def execute(self, userdata):
+        global state_upd_time
+        rospy.sleep(state_upd_time)
         return 'remain'
         return 'grabbed'
 
@@ -106,6 +111,8 @@ class MoveState(smach.State):
         smach.State.__init__(self, outcomes=['released', 'remain'])
 
     def execute(self, userdata):
+        global state_upd_time
+        rospy.sleep(state_upd_time)
         return 'remain'
         return 'released'
 
@@ -117,6 +124,8 @@ class ReturnHomeState(smach.State):
         smach.State.__init__(self, outcomes=['homed', 'remain'])
 
     def execute(self, userdata):
+        global state_upd_time
+        rospy.sleep(state_upd_time)
         return 'remain'
         return 'homed'
 
