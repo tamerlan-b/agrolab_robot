@@ -9,14 +9,16 @@
     <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     
+    <!-- Запуск RViz -->
     <!-- <arg name="rvizconfig" default="$(find agrolab_description)/rviz/urdf.rviz" /> -->
     <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
 
-    <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch" /> -->
+    <!-- Запускаем Gazebo вместе с миром, в котором есть объекты -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find agrolab_description)/world/apple.world.xml" />
+        <arg name="world_name" value="$(find agrolab_description)/worlds/apple_world.world.xml" />
     </include>
 
+    <!-- Добавляем модель робота в Gazebo -->
     <node pkg="gazebo_ros" type="spawn_model" name="model" args="-urdf -model test -param robot_description"  />
     
     <!-- <node pkg="agrolab_description" type="control.py" name="control" output="screen" />
