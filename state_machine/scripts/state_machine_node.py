@@ -4,6 +4,7 @@ import rospy
 import smach
 import smach_ros
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
+from geometry_msgs.msg import Point
 
 
 class WaitState(smach.State):
@@ -47,30 +48,44 @@ class SearchState(smach.State):
         # Сервис для остановки КА
         self.stop_fsm_service: rospy.Service = rospy.Service('~stop_fsm', Trigger, self.stop_callback)
         self.stop_fsm = False
+        self.see_object = False
 
         # Сервис остановки процедуры поиска
         rospy.wait_for_service('/search_node/stop_searching')
         self.stop_search_client = rospy.ServiceProxy('/search_node/stop_searching', Trigger)
-        smach.State.__init__(self, outcomes=['find_object', 'stop', 'searching'])
+        # Подписываемся на топик с координатами объекта
+        rospy.Subscriber("/apple_detector/detected_object", Point, self.object_callback)
+        smach.State.__init__(self, outcomes=['find_object', 'stop', 'remain'])
 
+    def object_callback(self, msg: Point):
+        self.see_object = True
+        rospy.loginfo("See object")
     
     def stop_callback(self, request: TriggerRequest) -> TriggerResponse:
         self.stop_fsm = True
         return TriggerResponse()
 
+    def stop_search(self):
+        try:
+            # Останавливаем поиск объекта
+            resp: TriggerResponse = self.stop_search_client(TriggerRequest())
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
     def execute(self, userdata):
         rospy.sleep(2.0)
+        
         if self.stop_fsm:
             self.stop_fsm = False
-            try:
-                # Останавливаем поиск объекта
-                resp: TriggerResponse = self.stop_search_client(TriggerRequest())
-            except rospy.ServiceException as e:
-                print("Service call failed: %s"%e)
+            self.stop_search()
             return 'stop'
+        
+        if self.see_object:
+            self.see_object = False
+            self.stop_search()
+            return 'find_object'
+        
         return 'remain'
-        # return 'find_object'
 
 class GrabState(smach.State):
     """Состояние захвата объекта
