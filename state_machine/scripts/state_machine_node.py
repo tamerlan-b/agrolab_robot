@@ -14,6 +14,11 @@ class WaitState(smach.State):
         # Сервис для запуска КА
         self.start_fsm_service: rospy.Service = rospy.Service('~start_fsm', Trigger, self.start_callback)
         self.start_fsm = False
+
+        # Сервис поиска объекта
+        rospy.wait_for_service('/search_node/start_searching')
+        self.start_search_client = rospy.ServiceProxy('/search_node/start_searching', Trigger)
+        
         smach.State.__init__(self, outcomes=['start', 'wait'])
     
     def start_callback(self, request: TriggerRequest) -> TriggerResponse:
@@ -22,7 +27,15 @@ class WaitState(smach.State):
 
     def execute(self, userdata):
         rospy.sleep(2.0)
-        return 'start'  if self.start_fsm else 'wait'
+        if self.start_fsm:
+            try:
+                # Запускаем поиск объекта
+                resp: TriggerResponse = self.start_search_client(TriggerRequest())
+            except rospy.ServiceException as e:
+                print("Service call failed: %s"%e)
+            return 'start'
+        else:
+            return 'wait'
 
 class SearchState(smach.State):
     """Состояние поиска объекта
