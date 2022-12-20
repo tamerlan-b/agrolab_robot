@@ -3,6 +3,7 @@
 
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Float64
 import threading
 import rospy
 import time
@@ -10,7 +11,13 @@ import time
 class Searcher:
     def __init__(self):
         rospy.init_node("search_node")
+        self.mode = "GAZEBO"                        # Режим работы RVIZ или GAZEBO
+
         self.publisher: rospy.Publisher = rospy.Publisher('/joint_states', JointState, queue_size=10)
+
+        self.X_publisher = rospy.Publisher('/agrolab/base_link_to_X_controller/command', Float64, queue_size = 100)
+        self.Y_publisher = rospy.Publisher('/agrolab/X_to_Y_controller/command', Float64, queue_size = 100)
+        self.Z_publisher = rospy.Publisher('/agrolab/Y_to_Z_controller/command', Float64, queue_size = 100)
 
         self.max_x: float = 0.43                    # Предельная координата по х
         self.max_y: float = 0.54                    # Предельная координата по у
@@ -101,10 +108,17 @@ class Searcher:
                         current_x_path = 0
                     else:
                         current_x_path += self.x_delta
-            
-                msg: JointState = self.get_msg(self.x, self.y, self.z)  # Генерация сообщения с обновленными координатами
-                self.publisher.publish(msg)                 # Отправка сообщения в топик для перемещения робота
-                time.sleep(self.time_delta)                 # Временная задержка перед следующей итерацией
+
+                # В зависимости от режима работы происходит управление либо моделью в Gazebo, либо в Rviz
+                if self.mode == "GAZEBO":
+                    self.X_publisher.publish(self.x)
+                    self.Y_publisher.publish(self.y)
+                    self.Z_publisher.publish(self.z)
+                elif self.mode == "RVIZ":
+                    msg: JointState = self.get_msg(self.x, self.y, self.z)  # Генерация сообщения с обновленными координатами
+                    self.publisher.publish(msg)                             # Отправка сообщения в топик для перемещения робота
+
+                time.sleep(self.time_delta)                             # Временная задержка перед следующей итерацией
 
     def get_msg(self, x: float, y: float, z: float) -> JointState:
         """Функция для генерации сообщения для отправки в топик управления роботом

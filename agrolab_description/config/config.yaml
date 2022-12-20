@@ -1,19 +1,29 @@
 agrolab:
-    - joint_state_controller:
+    joint_state_controller:
         type: joint_state_controller/JointStateController
-        publish_rate: 20
+        publish_rate: 50
 
-    - base_link_to_x_controller:
-        type: position_controllers/JointPositionController
+    base_link_to_X_controller:
+        type: effort_controllers/JointPositionController
         joint: base_link_to_X
-        pid: {p: 1000.0, i: 0.01, d: 0.0}
-    
-    - x_to_y_controller:
-        type: position_controllers/JointPositionController
-        joint: X_to_Y
-        pid: {p: 1000.0, i: 0.01, d: 0.0}
+        pid: {p: 50.0, i: 0.1, d: 10.0}
 
-    - y_to_z_controller:
-        type: position_controllers/JointPositionController
+    X_to_Y_controller:
+        type: effort_controllers/JointPositionController
+        joint: X_to_Y
+        pid: {p: 50.0, i: 0.1, d: 10.0}
+
+    Y_to_Z_controller:
+        type: effort_controllers/JointPositionController
         joint: Y_to_Z
-        pid: {p: 1000.0, i: 0.01, d: 0.0}
+        pid: {p: 50.0, i: 0.1, d: 10.0}
+    
+    gripper_controller:
+        type: effort_controllers/JointPositionController
+        joint: gripper
+        pid: {p: 50.0, i: 0.1, d: 0}
+
+    gripper_sub_controller:
+        type: effort_controllers/JointPositionController
+        joint: gripper_sub
+        pid: {p: 50.0, i: 0.1, d: 0}

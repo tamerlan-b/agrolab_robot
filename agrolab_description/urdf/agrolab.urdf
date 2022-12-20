@@ -1,285 +1,402 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="agrolab">
-    
-
-  <xacro:property name="base_link_to_x" value="base_link_to_X" />
-  <xacro:property name="x_to_y" value="X_to_Y" />
-  <xacro:property name="y_to_z" value="Y_to_Z" />
-
-  <transmission name="${base_link_to_x}_tran">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="${base_link_to_x}">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="${base_link_to_x}_motor">
-			<hardwareInterface>hardware_interface/PositionJointInterfacee</hardwareInterface>
-		</actuator>
-	</transmission>
-
-  <transmission name="${x_to_y}_tran">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="${x_to_y}">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="${x_to_y}_motor">
-			<hardwareInterface>hardware_interface/PositionJointInterfacee</hardwareInterface>
-		</actuator>
-	</transmission>
-
-  <transmission name="${y_to_z}_tran">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="${y_to_z}">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="${y_to_z}_motor">
-			<hardwareInterface>hardware_interface/PositionJointInterfacee</hardwareInterface>
-		</actuator>
-	</transmission>
-
+<robot name="agrolab">
     <link name="base_link">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/case.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/case.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-      </collision>
-      <inertial>
-      <mass value="7"/>
-      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/case.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/case.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+        </collision>
+        <inertial>
+            <mass value="20"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
     </link>
+    <gazebo reference="base_link">
+        <material>Gazebo/White</material>
+    </gazebo>
 
     <link name="Light">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/light.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/light.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-      </collision>
-    <inertial>
-      <mass value="0.1"/>
-      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/light.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/light.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+        </collision>
+        <inertial>
+            <mass value="0.1"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
     </link>
+    <!-- <gazebo reference="Light">
+        <material>Gazebo/Yellow</material>
+    </gazebo> -->
 
     <link name="Water_tank">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/water_tank.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/water_tank.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-      </collision>
-     <inertial>
-      <mass value="0.5"/>
-       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/water_tank.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/water_tank.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+        </collision>
+        <inertial>
+            <mass value="1.5"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
     </link>
+    <!-- <gazebo reference="Water_tank">
+        <material>Gazebo/White</material>
+    </gazebo> -->
     
     <link name="Stand">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/stand.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/stand.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-      </collision>
-    <inertial>
-      <mass value="0.01"/>
-       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
-    </link>  
-          
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/stand.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/stand.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+        </collision>
+        <inertial>
+            <mass value="0.01"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
+    </link>
+    <!-- <gazebo reference="Stand">
+        <material>Gazebo/Black</material>
+    </gazebo> -->
+    
+    <!-- X4 -->
     <link name="X">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/X.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/X.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 0 0"/>
-      </collision>
-    <inertial>
-      <mass value="1"/>
-       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/X.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/X.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+        </collision>
+        <inertial>
+            <mass value="1"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
     </link>
+    <!-- <gazebo reference="X">
+        <material>Gazebo/Red</material>
+    </gazebo> -->
 
+    <!-- Y5 -->
     <link name="Y">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 -0.01 0"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/Y.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/Y.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 -0.01 0"/>
-      </collision>
-    <inertial>
-      <mass value="1.8543"/>
-       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 -0.01 0"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/Y.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/Y.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 -0.01 0"/>
+        </collision>
+        <inertial>
+            <mass value="1.8543"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
     </link>
+    <!-- <gazebo reference="Y">
+        <material>Gazebo/Green</material>
+    </gazebo> -->
     
+    <!-- Z6 -->
     <link name="Z">
-      <visual>
-        <origin rpy="0 0 0" xyz="0 -0.01 0.02"/>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/Z.dae" scale="1 1 1"/>
-        </geometry>
-      </visual>
-      <collision>
-        <geometry>
-          <mesh filename="package://agrolab_description/meshes/Z.stl" scale="1 1 1"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="0 -0.01 0.02"/>
-      </collision>
-    <inertial>
-      <mass value="0.337"/>
-       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
-    </inertial>
-    </link>      
+        <visual>
+            <origin rpy="0 0 0" xyz="0 -0.01 0.02"/>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/Z.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/Z.stl" scale="1 1 1"/>
+            </geometry>
+            <origin rpy="0 0 0" xyz="0 -0.01 0.02"/>
+        </collision>
+        <inertial>
+            <mass value="0.337"/>
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+        </inertial>
+    </link>
+    <!-- <gazebo reference="Z">
+        <material>Gazebo/Blue</material>
+    </gazebo>    -->
 
-  <joint name="base_link_to_light" type="fixed">
-    <parent link="base_link"/>
-    <child link="Light"/>
-  </joint>
-  
-  <joint name="base_link_to_water_tank" type="fixed">
-    <parent link="base_link"/>
-    <child link="Water_tank"/>
-  </joint>  
-  
-  <joint name="base_link_to_stand" type="fixed">
-    <parent link="base_link"/>
-    <child link="Stand"/>
-  </joint>  
-        
-  <joint name="${base_link_to_x}" type="prismatic">
-    <parent link="base_link"/>
-    <child link="X"/>
-    <axis xyz="1 0 0" />
-    <limit effort="10000" lower="0" upper="0.43" velocity="1" />
-  </joint>
-  
-  <joint name="${x_to_y}" type="prismatic">
-    <parent link="X"/>
-    <child link="Y"/>
-    <axis xyz="0 1 0" />
-    <limit effort="10000" lower="0" upper="0.54" velocity="1" />
-  </joint>   
-  
-  <joint name="${y_to_z}" type="prismatic">
-    <parent link="Y"/>
-    <child link="Z"/>
-    <axis xyz="0 0 -1" />
-    <limit effort="10000" lower="0" upper="0.2" velocity="1" />
-  </joint>
+    <link name="Camera">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.02 0.02 0.02" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.02 0.02 0.02" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.01" />
+            <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
+        </inertial>
+    </link>
 
-  <!-- Gazebo plugin for ROS Control -->
-  <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/</robotNamespace>
-    </plugin>
-  </gazebo>
+    <gazebo reference="Camera">
+        <material>Gazebo/Black</material>
+        <sensor type="camera" name="camera_node">
+            <update_rate>30.0</update_rate>
+            <camera name="top">
+                <horizontal_fov>1.3962634</horizontal_fov>
+                <image>
+                    <width>1280</width>
+                    <height>720</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.2</near>
+                    <far>300</far>
+                </clip>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+            </camera>
+            <plugin name="gazebo_camera" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>0.0</updateRate>
+                <cameraName>/agrolabCamera</cameraName>
+                <imageTopicName>image_raw</imageTopicName>
+                <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+                <frameName>Camera</frameName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1>
+                <distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3>
+                <distortionT1>0.0</distortionT1>
+                <distortionT2>0.0</distortionT2>
+            </plugin>
+        </sensor>
+    </gazebo>
 
-<joint name="camera_joint" type="fixed">
-    <axis xyz="0 1 0" />
-    <origin xyz="-0.26 -0.26 0.4" rpy="0 1.57 0"/>
-    <parent link="Y"/>
-    <child link="camera_link"/>
-  </joint>
+    <joint name="base_link_to_light" type="fixed">
+        <parent link="base_link"/>
+        <child link="Light"/>
+    </joint>
 
-  <!-- Camera -->
-  <link name="camera_link">
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-    <box size="0.01 0.01 0.01"/>
-      </geometry>
-    </collision>
+    <joint name="base_link_to_water_tank" type="fixed">
+        <parent link="base_link"/>
+        <child link="Water_tank"/>
+    </joint>  
 
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-    <box size="0.01 0.01 0.01"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-
+    <joint name="base_link_to_stand" type="fixed">
+        <parent link="base_link"/>
+        <child link="Stand"/>
+    </joint>  
     
-  </link>
+    <joint name="base_link_to_X" type="prismatic">
+        <parent link="base_link"/>
+        <child link="X"/>
+        <axis xyz="1 0 0" />
+        <limit effort="10000" lower="0" upper="0.43" velocity="1" />
+        <dynamics damping="15.99"/>
+    </joint>
 
+    <joint name="X_to_Y" type="prismatic">
+        <parent link="X"/>
+        <child link="Y"/>
+        <axis xyz="0 1 0" />
+        <limit effort="10000" lower="0" upper="0.54" velocity="1" />
+        <dynamics damping="15.99"/>
+    </joint>  
 
- <!-- camera -->
-  <gazebo reference="camera_link">
-    <sensor type="camera" name="camera1">
-      <update_rate>30.0</update_rate>
-      <camera name="head">
-        <horizontal_fov>1.3962634</horizontal_fov>
-        <image>
-          <width>800</width>
-          <height>800</height>
-          <format>R8G8B8</format>
-        </image>
-        <clip>
-          <near>0.02</near>
-          <far>300</far>
-        </clip>
-        <noise>
-          <type>gaussian</type>
-          <!-- Noise is sampled independently per pixel on each frame.
-               That pixel's noise value is added to each of its color
-               channels, which at that point lie in the range [0,1]. -->
-          <mean>0.0</mean>
-          <stddev>0.007</stddev>
-        </noise>
-      </camera>
-      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>0.0</updateRate>
-        <cameraName>cam_top</cameraName>
-        <imageTopicName>image_raw</imageTopicName>
-        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <frameName>camera_link</frameName>
-        <hackBaseline>0.07</hackBaseline>
-        <distortionK1>0.0</distortionK1>
-        <distortionK2>0.0</distortionK2>
-        <distortionK3>0.0</distortionK3>
-        <distortionT1>0.0</distortionT1>
-        <distortionT2>0.0</distortionT2>
-      </plugin>
-    </sensor>
-  </gazebo>
+    <joint name="Y_to_Z" type="prismatic">
+        <parent link="Y"/>
+        <child link="Z"/>
+        <axis xyz="0 0 -1" />
+        <limit effort="10000" lower="0" upper="0.2" velocity="1" />
+        <dynamics damping="15.99"/>
+    </joint>
 
+    <joint name="Camera2Light" type="continuous">
+        <parent link="Y" />
+        <child link="Camera" />
+        <origin xyz="-0.26 -0.26 0.4" rpy="0 1.57 0"/>
+    </joint>
 
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+                <robotNamespace>/agrolab</robotNamespace>
+            <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        </plugin>
+    </gazebo>
+
+    <transmission name="base_link_to_X">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="base_link_to_X">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="base_link_to_X_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="X_to_Y">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="X_to_Y">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="X_to_Y_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="Y_to_Z">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="Y_to_Z">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="Y_to_Z_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <link name="gripper_link1">
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/link7.dae" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+        <visual>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/link7.dae" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.01"/>
+            <inertia
+                ixx="0.01" ixy="0.0" ixz="0.0"
+                iyy="0.01" iyz="0.0"
+                izz="0.01"/>
+        </inertial>
+    </link>
+    <gazebo reference="gripper_link1"> 
+        <material>Gazebo/Green</material>
+        <!-- <kp>10000.0</kp>
+        <kd>10000.0</kd>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+        <minDepth>0.001</minDepth>  
+        <maxVel>0</maxVel>   -->
+    </gazebo>
+
+    <link name="gripper_link2">
+        <collision>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/link7.dae" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+        <visual>
+            <geometry>
+                <mesh filename="package://agrolab_description/meshes/link7.dae" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.01"/>
+            <inertia
+                ixx="0.01" ixy="0.0" ixz="0.0"
+                iyy="0.01" iyz="0.0"
+                izz="0.01"/>
+        </inertial>
+    </link>
+    <gazebo reference="gripper_link2"> 
+        <material>Gazebo/Orange</material>
+        <!-- <kp>10000.0</kp>
+        <kd>10000.0</kd>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+        <minDepth>0.001</minDepth>  
+        <maxVel>0</maxVel>   -->
+    </gazebo>
+
+    <joint name="gripper" type="prismatic">
+        <parent link="Z"/>
+        <child link="gripper_link1"/>
+        <origin xyz = "-0.22 -0.26 0.25" rpy="1.57 3.14 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="3" lower="0" upper="0.040" velocity="0.05"/>
+        <dynamics damping="0.99"/>
+    </joint>
+
+    <joint name="gripper_sub" type="prismatic">
+        <parent link="Z"/>
+        <child link="gripper_link2"/>
+        <origin xyz = "-0.22 -0.26 0.25" rpy="-1.57 0 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="3" lower="0" upper="0.040" velocity="0.05"/>
+        <!-- <mimic joint="gripper_sub" multiplier="1" offset="0"/> -->
+        <dynamics damping="0.99"/>
+    </joint>
+    
+    <transmission name="gripper">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="gripper">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="gripper_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterfacee</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="gripper_sub">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="gripper_sub">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="gripper_sub_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterfacee</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
 </robot>
