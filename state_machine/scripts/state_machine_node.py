@@ -29,10 +29,11 @@ class SearchState(smach.State):
     """
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['find_object', 'stop'])
+        smach.State.__init__(self, outcomes=['find_object', 'stop', 'searching'])
 
     def execute(self, userdata):
         rospy.sleep(2.0)
+        return 'searching'
         return 'find_object'
 
 class GrabState(smach.State):
@@ -83,7 +84,8 @@ def main():
                                                                 'wait': 'Wait'})
         smach.StateMachine.add('Search', SearchState(), transitions={
                                                                     'find_object':'Grab', 
-                                                                    'stop':'Wait'})
+                                                                    'stop':'Wait',
+                                                                    'searching': 'Search'})
         smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move'})
         smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome'})
         smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search'})
