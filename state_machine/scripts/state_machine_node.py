@@ -92,10 +92,10 @@ class GrabState(smach.State):
     """
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['grabbed'])
+        smach.State.__init__(self, outcomes=['grabbed', 'remain'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        return 'remain'
         return 'grabbed'
 
 class MoveState(smach.State):
@@ -103,10 +103,10 @@ class MoveState(smach.State):
     """
     
     def __init__(self):
-        smach.State.__init__(self, outcomes=['released'])
+        smach.State.__init__(self, outcomes=['released', 'remain'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        return 'remain'
         return 'released'
 
 class ReturnHomeState(smach.State):
@@ -114,10 +114,10 @@ class ReturnHomeState(smach.State):
     """
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['homed'])
+        smach.State.__init__(self, outcomes=['homed', 'remain'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        return 'remain'
         return 'homed'
 
 
@@ -133,13 +133,15 @@ def main():
 
         smach.StateMachine.add('Wait', WaitState(), transitions={'start':'Search',
                                                                 'remain': 'Wait'})
-        smach.StateMachine.add('Search', SearchState(), transitions={
-                                                                    'find_object':'Grab', 
+        smach.StateMachine.add('Search', SearchState(), transitions={'find_object':'Grab', 
                                                                     'stop':'Wait',
                                                                     'remain': 'Search'})
-        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move'})
-        smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome'})
-        smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search'})
+        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move',
+                                                                'remain': 'Grab'})
+        smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome',
+                                                                'remain': 'Move'})
+        smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search',
+                                                                            'remain': 'ReturnHome'})
 
     # Визуализируем состояния
     sis = smach_ros.IntrospectionServer('agrolab', sm, '/SM_ROOT')
