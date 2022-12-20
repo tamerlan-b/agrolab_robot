@@ -157,6 +157,25 @@
         <material>Gazebo/Blue</material>
     </gazebo>    -->
 
+    <!-- Sphere 1 -->
+    <link name="sphere1">
+        <visual>
+        
+        <geometry>
+            <sphere radius="0.02"/>
+        </geometry>
+        </visual>
+    </link>
+    <gazebo reference="sphere1">
+        <material>Gazebo/Red</material>
+    </gazebo>
+    <joint name="sphere1" type="fixed">
+        <parent link="base_link"/>
+        <child link="sphere1"/>
+        <origin xyz="-0.215 0.1775 0.06"/>
+    </joint>
+    <!-- Sphere 1 end -->
+
     <link name="Camera">
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
