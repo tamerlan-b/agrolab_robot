@@ -10,6 +10,10 @@
 sudo apt install ros-noetic-smach-viewer
 ```
 
+Зависимости для детектора:
+* opencv
+* cv_bridge
+
 ### Подготовка
 1. Создать ROS-workspace
 ```bash  

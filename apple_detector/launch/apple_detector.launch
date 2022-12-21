@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="apple_detector" type="apple_detector_node.py" name="apple_detector" output="screen"/>
+
+    <!-- <node pkg="rqt_image_view" type="rqt_image_view" name="bag_image_view" args="/agrolabCamera/image_raw" output="screen"/>
+    <node pkg="rqt_image_view" type="rqt_image_view" name="apple_detector_view" args="apple_detector/debug/image" output="screen"/> -->
+</launch>
