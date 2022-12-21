@@ -24,7 +24,7 @@ class Searcher:
         self.max_z: float = 0.2                     # Предельная координата по z
         self.x: float = 0                           # Текущая координата по х
         self.y: float = 0                           # Текущая координата по у
-        self.z: float = 0.15                        # Текущая координата по z
+        self.z: float = 0                           # Текущая координата по z
 
         self.searching_in_process: bool = False      # Если флаг True, то идет поиск, если False - робот стоит на месте
 

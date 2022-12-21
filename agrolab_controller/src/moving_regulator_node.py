@@ -26,6 +26,7 @@ class MovingRegulator:
         self.Z_subscriber = rospy.Subscriber('/agrolab/Y_to_Z_controller/command', Float64, self.z_callback)
 
         self.detection_subscriber = rospy.Subscriber('/apple_detector/detected_object', Point, self.detection_callback)
+        self.displace_subscriber = rospy.Subscriber('~displace', Point, self.displace_callback)
 
         self.moving_in_process: bool = False      # Если флаг True, то идет поиск, если False - робот стоит на месте
 
@@ -52,8 +53,8 @@ class MovingRegulator:
 
         threading.Thread(target=self.displace_by_coords, daemon=True).start()    # Поток, в котором происходит управление перемещением робота
 
-        self.start_moving_service: rospy.Service = rospy.Service('~start_moving', Trigger, self.start_moving_callback)     # Сервис ROS для возобновления "поиска"
-        self.stop_moving_service: rospy.Service = rospy.Service('~stop_moving', Trigger, self.stop_moving_callback)        # Сервис ROS для остановки "поиска"
+        self.start_moving_service: rospy.Service = rospy.Service('~start_moving', Trigger, self.start_moving_callback)
+        self.stop_moving_service: rospy.Service = rospy.Service('~stop_moving', Trigger, self.stop_moving_callback)
 
     def start_moving_callback(self, request: TriggerRequest):
         self.moving_in_process: bool = True
@@ -62,6 +63,11 @@ class MovingRegulator:
     def stop_moving_callback(self, request: TriggerRequest):
         self.moving_in_process: bool = False
         return TriggerResponse()
+    
+    def displace_callback(self, request: Point):
+        self.X_publisher.publish(self.x+request.x)
+        self.Y_publisher.publish(self.y+request.y)
+        self.Z_publisher.publish(self.z+request.z)
 
     def x_callback(self, data: Float64):
         self.x = data.data
