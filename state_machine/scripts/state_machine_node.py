@@ -4,7 +4,9 @@ import rospy
 import smach
 import smach_ros
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
+from geometry_msgs.msg import Point
 
+state_upd_time = 0.5
 
 class WaitState(smach.State):
     """Состояние ожидания запуска конечного автомата (КА)
@@ -19,14 +21,15 @@ class WaitState(smach.State):
         rospy.wait_for_service('/search_node/start_searching')
         self.start_search_client = rospy.ServiceProxy('/search_node/start_searching', Trigger)
         
-        smach.State.__init__(self, outcomes=['start', 'wait'])
+        smach.State.__init__(self, outcomes=['start', 'remain'])
     
     def start_callback(self, request: TriggerRequest) -> TriggerResponse:
         self.start_fsm = True
         return TriggerResponse()
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
         if self.start_fsm:
             # Сбрасываем переменную
             self.start_fsm = False
@@ -37,7 +40,7 @@ class WaitState(smach.State):
                 print("Service call failed: %s"%e)
             return 'start'
         else:
-            return 'wait'
+            return 'remain'
 
 class SearchState(smach.State):
     """Состояние поиска объекта
@@ -47,40 +50,57 @@ class SearchState(smach.State):
         # Сервис для остановки КА
         self.stop_fsm_service: rospy.Service = rospy.Service('~stop_fsm', Trigger, self.stop_callback)
         self.stop_fsm = False
+        self.see_object = False
 
         # Сервис остановки процедуры поиска
         rospy.wait_for_service('/search_node/stop_searching')
         self.stop_search_client = rospy.ServiceProxy('/search_node/stop_searching', Trigger)
-        smach.State.__init__(self, outcomes=['find_object', 'stop', 'searching'])
+        # Подписываемся на топик с координатами объекта
+        rospy.Subscriber("/apple_detector/detected_object", Point, self.object_callback)
+        smach.State.__init__(self, outcomes=['find_object', 'stop', 'remain'])
 
+    def object_callback(self, msg: Point):
+        self.see_object = True
+        rospy.loginfo("See object")
     
     def stop_callback(self, request: TriggerRequest) -> TriggerResponse:
         self.stop_fsm = True
         return TriggerResponse()
 
+    def stop_search(self):
+        try:
+            # Останавливаем поиск объекта
+            resp: TriggerResponse = self.stop_search_client(TriggerRequest())
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
+        
         if self.stop_fsm:
             self.stop_fsm = False
-            try:
-                # Останавливаем поиск объекта
-                resp: TriggerResponse = self.stop_search_client(TriggerRequest())
-            except rospy.ServiceException as e:
-                print("Service call failed: %s"%e)
+            self.stop_search()
             return 'stop'
-        return 'searching'
-        # return 'find_object'
+        
+        if self.see_object:
+            self.see_object = False
+            self.stop_search()
+            return 'find_object'
+        
+        return 'remain'
 
 class GrabState(smach.State):
     """Состояние захвата объекта
     """
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['grabbed'])
+        smach.State.__init__(self, outcomes=['grabbed', 'remain'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
+        return 'remain'
         return 'grabbed'
 
 class MoveState(smach.State):
@@ -88,10 +108,12 @@ class MoveState(smach.State):
     """
     
     def __init__(self):
-        smach.State.__init__(self, outcomes=['released'])
+        smach.State.__init__(self, outcomes=['released', 'remain'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
+        return 'remain'
         return 'released'
 
 class ReturnHomeState(smach.State):
@@ -99,10 +121,12 @@ class ReturnHomeState(smach.State):
     """
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['homed'])
+        smach.State.__init__(self, outcomes=['homed', 'remain'])
 
     def execute(self, userdata):
-        rospy.sleep(2.0)
+        global state_upd_time
+        rospy.sleep(state_upd_time)
+        return 'remain'
         return 'homed'
 
 
@@ -117,14 +141,16 @@ def main():
     with sm:
 
         smach.StateMachine.add('Wait', WaitState(), transitions={'start':'Search',
-                                                                'wait': 'Wait'})
-        smach.StateMachine.add('Search', SearchState(), transitions={
-                                                                    'find_object':'Grab', 
+                                                                'remain': 'Wait'})
+        smach.StateMachine.add('Search', SearchState(), transitions={'find_object':'Grab', 
                                                                     'stop':'Wait',
-                                                                    'searching': 'Search'})
-        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move'})
-        smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome'})
-        smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search'})
+                                                                    'remain': 'Search'})
+        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move',
+                                                                'remain': 'Grab'})
+        smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome',
+                                                                'remain': 'Move'})
+        smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search',
+                                                                            'remain': 'ReturnHome'})
 
     # Визуализируем состояния
     sis = smach_ros.IntrospectionServer('agrolab', sm, '/SM_ROOT')
