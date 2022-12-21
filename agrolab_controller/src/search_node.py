@@ -24,11 +24,11 @@ class Searcher:
         self.max_z: float = 0.2                     # Предельная координата по z
         self.x: float = 0                           # Текущая координата по х
         self.y: float = 0                           # Текущая координата по у
-        self.z: float = 0.15                        # Текущая координата по z
+        self.z: float = 0                           # Текущая координата по z
 
         self.searching_in_process: bool = False      # Если флаг True, то идет поиск, если False - робот стоит на месте
 
-        speed: int = 2                              # Скорость робота (коэффициент)
+        speed: int = 0.5                              # Скорость робота (коэффициент)
         self.x_path_delta = 0.03                    # Участок пути по х, который робот проходит за один прогон
         self.x_delta: float = 0.005                 # Cмещение по х за одну итерацию
         self.y_delta: float = 0.005                 # Cмещение по у за одну итерацию
