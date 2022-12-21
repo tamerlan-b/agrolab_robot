@@ -272,10 +272,21 @@
         <dynamics damping="15.99"/>
     </joint>
 
-    <joint name="Camera2Light" type="continuous">
+    <!-- <joint name="Camera2Light" type="continuous">
         <parent link="Y" />
         <child link="Camera" />
         <origin xyz="-0.28 -0.26 0.30" rpy="0 1.57079632679 0"/>
+        <joint_properties damping="10000000.0" friction="10000000000.0"/>
+    </joint> -->
+
+    <joint name="Camera2Light" type="prismatic">
+        <parent link="Y" />
+        <child link="Camera" />
+        <origin xyz="-0.28 -0.26 0.30" rpy="0 1.57079632679 0"/>
+        <!-- <joint_properties damping="10000000.0" friction="10000000000.0"/> -->
+        <axis xyz="0 0 -1" />
+        <limit effort="10000" lower="0" upper="0.2" velocity="1" />
+        <dynamics damping="15.99"/>
     </joint>
 
     <gazebo>
@@ -381,7 +392,7 @@
     <joint name="gripper" type="prismatic">
         <parent link="Z"/>
         <child link="gripper_link1"/>
-        <origin xyz = "-0.22 -0.26 0.25" rpy="1.57 3.14 0" />
+        <origin xyz = "-0.22 -0.26 0.35" rpy="1.57 3.14 0" />
         <axis xyz="0 0 1" />
         <limit effort="3" lower="0" upper="0.040" velocity="0.05"/>
         <dynamics damping="0.99"/>
@@ -390,7 +401,7 @@
     <joint name="gripper_sub" type="prismatic">
         <parent link="Z"/>
         <child link="gripper_link2"/>
-        <origin xyz = "-0.22 -0.26 0.25" rpy="-1.57 0 0" />
+        <origin xyz = "-0.22 -0.26 0.35" rpy="-1.57 0 0" />
         <axis xyz="0 0 1" />
         <limit effort="3" lower="0" upper="0.040" velocity="0.05"/>
         <!-- <mimic joint="gripper_sub" multiplier="1" offset="0"/> -->
