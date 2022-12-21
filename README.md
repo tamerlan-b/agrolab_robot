@@ -30,14 +30,36 @@ cd ..
 source /opt/ros/noetic/setup.bash
 catkin_make
 ```
-
-### Запуск системы (RViz, Gazebo, машина состояний и поиск объекта)
+4. Запустить систему
+##### а) Запуск системы одним launch-файлом (RViz, Gazebo, машина состояний и поиск объекта) - пока работает нестабильно
 ```bash  
 source devel/setup.bash
 roslaunch state_machine system.launch
 ```
+##### б) Запуск системы по частям
+Gazebo с роботом:  
+```bash  
+roslaunch agrolab_description display.launch
+```
+Машина состояний:  
+```bash  
+roslaunch state_machine state_machine.launch
+```  
+Узел поиска объектов:  
+```bash  
+roslaunch agrolab_controller search_node.launch
+```  
+Детектор объектов:  
+```bash  
+roslaunch apple_detector apple_detector.launch
+```  
+Узел приближения к объекту:  
+```bash  
+roslaunch agrolab_controller moving.launch
+```  
 
-### Запуск машины состояний
+
+5. Запустить машину состояний
 ```bash  
 source devel/setup.bash
 rosservice call /state_machine/start_fsm "{}"
