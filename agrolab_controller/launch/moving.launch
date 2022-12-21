@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="agrolab_controller" name="moving_regulator_node" type="moving_regulator_node.py" output="screen">
+    </node>
+</launch>

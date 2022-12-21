@@ -6,24 +6,24 @@ agrolab:
     base_link_to_X_controller:
         type: effort_controllers/JointPositionController
         joint: base_link_to_X
-        pid: {p: 50.0, i: 0.1, d: 10.0}
+        pid: {p: 50.0, i: 0.5, d: 10.0}
 
     X_to_Y_controller:
         type: effort_controllers/JointPositionController
         joint: X_to_Y
-        pid: {p: 50.0, i: 0.1, d: 10.0}
+        pid: {p: 50.0, i: 0.5, d: 10.0}
 
     Y_to_Z_controller:
         type: effort_controllers/JointPositionController
         joint: Y_to_Z
-        pid: {p: 50.0, i: 0.1, d: 10.0}
+        pid: {p: 50.0, i: 0.5, d: 10.0}
     
     gripper_controller:
         type: effort_controllers/JointPositionController
         joint: gripper
-        pid: {p: 50.0, i: 0.1, d: 0}
+        pid: {p: 50.0, i: 0.5, d: 0}
 
     gripper_sub_controller:
         type: effort_controllers/JointPositionController
         joint: gripper_sub
-        pid: {p: 50.0, i: 0.1, d: 0}
+        pid: {p: 50.0, i: 0.5, d: 0}
