@@ -39,7 +39,7 @@ class MovingRegulator:
         self.obj_x = 0
         self.obj_y = 0
 
-        speed: int = 1                              # Скорость робота (коэффициент)
+        speed: int = 0.5                              # Скорость робота (коэффициент)
         self.x_path_delta = 0.03                    # Участок пути по х, который робот проходит за один прогон
         self.x_delta: float = 0.005                 # Cмещение по х за одну итерацию
         self.y_delta: float = 0.005                 # Cмещение по у за одну итерацию
@@ -80,7 +80,7 @@ class MovingRegulator:
         while not rospy.is_shutdown():
             if self.moving_in_process and abs(self.obj_x) > 1280*self.epsilon and abs(self.obj_y) > 720*self.epsilon:
                 if abs(self.obj_x) > 1280*self.epsilon:
-                    if abs(self.obj_x) > 1280*self.epsilon*10:
+                    if abs(self.obj_x) > 1280*self.epsilon*15:
                         self.y -= self.y_delta * self.obj_x/abs(self.obj_x)
                         rospy.loginfo(f"{self.x_delta=}")
                     else:
@@ -88,7 +88,7 @@ class MovingRegulator:
                         rospy.loginfo(f"{self.x_delta/10=}")
 
                 if abs(self.obj_y) > 720*self.epsilon:
-                    if abs(self.obj_y) > 720*self.epsilon*15:
+                    if abs(self.obj_y) > 720*self.epsilon*20:
                         self.x -= self.x_delta * self.obj_y/abs(self.obj_y)
                         rospy.loginfo(f"{self.y_delta=}")
                     else:
