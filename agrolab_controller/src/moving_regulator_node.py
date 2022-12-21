@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding --utf-8--
 
-from agrolab_controller.srv import custom_pose, custom_poseRequest, custom_poseResponse
+# from agrolab_controller.srv import custom_pose, custom_poseRequest, custom_poseResponse
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Point
