@@ -90,6 +90,19 @@ class SearchState(smach.State):
         
         return 'remain'
 
+class GoToObjectState(smach.State):
+    """Состояние приближения к объекту и занятия положения над ним
+    """
+
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['arrive', 'remain'])
+
+    def execute(self, userdata):
+        global state_upd_time
+        rospy.sleep(state_upd_time)
+        return 'remain'
+        return 'arrive'
+
 class GrabState(smach.State):
     """Состояние захвата объекта
     """
@@ -103,10 +116,23 @@ class GrabState(smach.State):
         return 'remain'
         return 'grabbed'
 
-class MoveState(smach.State):
-    """Состояние перемещения объекта и его установки
+class MoveObjectState(smach.State):
+    """Состояние перемещения объекта в целевую точку
     """
     
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['arrive', 'remain'])
+
+    def execute(self, userdata):
+        global state_upd_time
+        rospy.sleep(state_upd_time)
+        return 'remain'
+        return 'arrive'
+
+class ReleaseState(smach.State):
+    """Состояние установки объекта в целевую точку
+    """
+
     def __init__(self):
         smach.State.__init__(self, outcomes=['released', 'remain'])
 
@@ -142,13 +168,17 @@ def main():
 
         smach.StateMachine.add('Wait', WaitState(), transitions={'start':'Search',
                                                                 'remain': 'Wait'})
-        smach.StateMachine.add('Search', SearchState(), transitions={'find_object':'Grab', 
+        smach.StateMachine.add('Search', SearchState(), transitions={'find_object':'GoToObject', 
                                                                     'stop':'Wait',
                                                                     'remain': 'Search'})
-        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'Move',
+        smach.StateMachine.add('GoToObject', GoToObjectState(), transitions={'arrive':'Grab',
+                                                                'remain': 'GoToObject'})
+        smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'MoveObject',
                                                                 'remain': 'Grab'})
-        smach.StateMachine.add('Move', MoveState(), transitions={'released':'ReturnHome',
-                                                                'remain': 'Move'})
+        smach.StateMachine.add('MoveObject', MoveObjectState(), transitions={'arrive':'Release',
+                                                                            'remain': 'MoveObject'})
+        smach.StateMachine.add('Release', ReleaseState(), transitions={'released':'ReturnHome',
+                                                                        'remain': 'Release'})
         smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search',
                                                                             'remain': 'ReturnHome'})
 
