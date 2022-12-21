@@ -95,11 +95,25 @@ class GoToObjectState(smach.State):
     """
 
     def __init__(self):
+        rospy.wait_for_service('/moving_regulator_node/start_moving')
+        self.move_to_object_client = rospy.ServiceProxy('/moving_regulator_node/start_moving', Trigger)
+        self.is_moving = False
         smach.State.__init__(self, outcomes=['arrive', 'remain'])
+    
+    def move_to_object(self):
+        try:
+            # Останавливаем поиск объекта
+            resp: TriggerResponse = self.move_to_object_client(TriggerRequest())
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
     def execute(self, userdata):
         global state_upd_time
         rospy.sleep(state_upd_time)
+
+        if not self.is_moving:
+            self.move_to_object()
+            self.is_moving = True
         return 'remain'
         return 'arrive'
 
