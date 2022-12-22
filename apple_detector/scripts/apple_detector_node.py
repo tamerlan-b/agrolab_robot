@@ -76,7 +76,7 @@ class ColorDetector:
         cnt_img = ImageProcessor.drawCenters(cnt_img, centers)
         debug_img_msg = self.bridge.cv2_to_imgmsg(cnt_img, encoding='rgb8', header=img.header)
         self.debug_img_pub.publish(debug_img_msg)
-        rospy.loginfo("I get image")
+        # rospy.loginfo("I get image")
     
 def main():    
     rospy.init_node('apple_detector', anonymous=True)

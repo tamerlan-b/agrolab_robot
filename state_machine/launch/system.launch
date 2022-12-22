@@ -3,11 +3,17 @@
     <include file="$(find agrolab_description)/launch/display.launch"/>
 
     <!-- Запускаем узел поиска объекта -->
-    <include file="$(find agrolab_controller)/launch/search_node.launch"/>
+    <node pkg="agrolab_controller" name="search_node" type="search_node.py" output="screen" />
+    <!-- <include file="$(find agrolab_controller)/launch/search_node.launch"/> -->
     
     <!-- Запускаем машину состояний -->
-    <include file="$(find state_machine)/launch/state_machine.launch"/>
+    <node pkg="state_machine" type="state_machine_node.py" name="state_machine" output="screen"/>
+    <!-- <include file="$(find state_machine)/launch/state_machine.launch"/> -->
 
     <!-- Запускаем детектор объектов -->
-    <include file="$(find apple_detector)/launch/apple_detector.launch"/>
+    <node pkg="apple_detector" type="apple_detector_node.py" name="apple_detector" output="screen"/>
+    <!-- <include file="$(find apple_detector)/launch/apple_detector.launch"/> -->
+
+    <!-- Запускаем узел приближения к объекту -->
+    <node pkg="agrolab_controller" name="moving_regulator_node" type="moving_regulator_node.py" output="screen"/>
 </launch>
