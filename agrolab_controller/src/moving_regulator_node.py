@@ -44,6 +44,7 @@ class MovingRegulator:
         self.x_path_delta = 0.03                    # Участок пути по х, который робот проходит за один прогон
         self.x_delta: float = 0.005                 # Cмещение по х за одну итерацию
         self.y_delta: float = 0.005                 # Cмещение по у за одну итерацию
+        self.z_delta: float = 0.005                 # Cмещение по z за одну итерацию
         self.time_delta: float = 0.01/speed         # Промежуток времени на одну итерацию
 
         self.epsilon = 0.001
@@ -55,6 +56,65 @@ class MovingRegulator:
 
         self.start_moving_service: rospy.Service = rospy.Service('~start_moving', Trigger, self.start_moving_callback)
         self.stop_moving_service: rospy.Service = rospy.Service('~stop_moving', Trigger, self.stop_moving_callback)
+
+        self.start_moving_subscriber: rospy.Subscriber = rospy.Subscriber('~absolute_moving', Point, self.absolute_moving_callback)
+
+    def absolute_moving_callback(self, data: Point):
+        if data.x - self.x != 0:
+            delta_x = self.x_delta*5 * (data.x - self.x)/abs(data.x - self.x)
+        else: 
+            delta_x = 0
+        if data.y - self.y != 0:
+            delta_y = self.y_delta*5 * (data.y - self.y)/abs(data.y - self.y)
+        else: 
+            delta_y = 0
+        if data.z - self.z != 0:
+            delta_z = self.z_delta*40 * (data.z - self.z)/abs(data.z - self.z)
+        else: 
+            delta_z = 0
+
+        while self.x != data.x or self.y != data.y or self.z != data.z:
+            if data.x != -1:
+                if self.x < data.x:
+                    if self.x + delta_x < data.x:
+                        self.x += delta_x
+                    else:
+                        self.x = data.x
+                elif self.x > data.x:
+                    if self.x + delta_x > data.x:
+                        self.x += delta_x
+                    else:
+                        self.x = data.x
+
+            if data.y != -1:
+                if self.y < data.y:
+                    if self.y + delta_y < data.y:
+                        self.y += delta_y
+                    else:
+                        self.y = data.y
+                elif self.y > data.y:
+                    if self.y + delta_y > data.y:
+                        self.y += delta_y
+                    else:
+                        self.y = data.y
+
+            if data.z != -1:
+                if self.z < data.z:
+                    if self.z + delta_z < data.z:
+                        self.z += delta_z
+                    else:
+                        self.z = data.z
+                elif self.z > data.z:
+                    if self.z + delta_z > data.z:
+                        self.z += delta_z
+                    else:
+                        self.z = data.z
+            
+            self.X_publisher.publish(self.x)
+            self.Y_publisher.publish(self.y)
+            self.Z_publisher.publish(self.z)
+            time.sleep(self.time_delta)
+
 
     def start_moving_callback(self, request: TriggerRequest):
         self.moving_in_process: bool = True
@@ -84,9 +144,9 @@ class MovingRegulator:
 
     def displace_by_coords(self):
         while not rospy.is_shutdown():
-            if self.moving_in_process and abs(self.obj_x) > 1280*self.epsilon and abs(self.obj_y) > 720*self.epsilon:
+            if self.moving_in_process and (abs(self.obj_x) > 1280*self.epsilon or abs(self.obj_y) > 720*self.epsilon):
                 if abs(self.obj_x) > 1280*self.epsilon:
-                    if abs(self.obj_x) > 1280*self.epsilon*15:
+                    if abs(self.obj_x) > 1280*self.epsilon*30:
                         self.y -= self.y_delta * self.obj_x/abs(self.obj_x)
                         rospy.loginfo(f"{self.x_delta=}")
                     else:
@@ -94,7 +154,7 @@ class MovingRegulator:
                         rospy.loginfo(f"{self.x_delta/10=}")
 
                 if abs(self.obj_y) > 720*self.epsilon:
-                    if abs(self.obj_y) > 720*self.epsilon*20:
+                    if abs(self.obj_y) > 720*self.epsilon*30:
                         self.x -= self.x_delta * self.obj_y/abs(self.obj_y)
                         rospy.loginfo(f"{self.y_delta=}")
                     else:

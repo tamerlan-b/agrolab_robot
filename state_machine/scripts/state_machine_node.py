@@ -5,6 +5,7 @@ import smach
 import smach_ros
 from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 from geometry_msgs.msg import Point
+from std_msgs.msg import Float64
 
 state_upd_time = 0.5
 
@@ -61,7 +62,7 @@ class SearchState(smach.State):
 
     def object_callback(self, msg: Point):
         self.see_object = True
-        rospy.loginfo("See object")
+        # rospy.loginfo("See object")
     
     def stop_callback(self, request: TriggerRequest) -> TriggerResponse:
         self.stop_fsm = True
@@ -96,10 +97,24 @@ class GoToObjectState(smach.State):
 
     def __init__(self):
         rospy.wait_for_service('/moving_regulator_node/start_moving')
+        self.displace_publisher = rospy.Publisher('/moving_regulator_node/displace', Point)
+
         self.move_to_object_client = rospy.ServiceProxy('/moving_regulator_node/start_moving', Trigger)
+        self.stop_move_to_object_client = rospy.ServiceProxy('/moving_regulator_node/stop_moving', Trigger)
+
+        self.detection_client = rospy.Subscriber('/apple_detector/detected_object', Point, self.detection_callback)
         self.is_moving = False
         smach.State.__init__(self, outcomes=['arrive', 'remain'])
+
+        self.detected_obj_x = 1000
+        self.detected_obj_y = 1000
+        self.staying_counter = 0
+        self.max_staying_count = 10
     
+    def detection_callback(self, data: Point):
+        self.detected_obj_x = data.x - 1280/2
+        self.detected_obj_y = data.y - 720/2
+
     def move_to_object(self):
         try:
             # Останавливаем поиск объекта
@@ -107,15 +122,41 @@ class GoToObjectState(smach.State):
         except rospy.ServiceException as e:
             print("Service call failed: %s"%e)
 
+    def stop_moving_to_object(self):
+        try:
+            # Останавливаем поиск объекта
+            resp: TriggerResponse = self.stop_move_to_object_client(TriggerRequest())
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
+
     def execute(self, userdata):
         global state_upd_time
         rospy.sleep(state_upd_time)
 
-        if not self.is_moving:
-            self.move_to_object()
-            self.is_moving = True
+        while True:
+            if not self.is_moving:
+                self.move_to_object()
+                self.is_moving = True
+            
+            if abs(self.detected_obj_x) <= 10 and abs(self.detected_obj_y) <= 10:
+                self.staying_counter += 1
+                rospy.sleep(0.1)
+            else:
+                self.staying_counter = 0
+            
+            if self.staying_counter > self.max_staying_count:
+                # self.X_publisher.publ1ish(-0.043)
+                self.stop_moving_to_object()
+                rospy.sleep(2)
+                msg = Point()
+                msg.x = -0.04
+                msg.y = 0.0
+                msg.z = 0.0
+                self.displace_publisher.publish(msg)
+                rospy.sleep(1)
+                return 'arrive' 
+
         return 'remain'
-        return 'arrive'
 
 class GrabState(smach.State):
     """Состояние захвата объекта
@@ -124,10 +165,35 @@ class GrabState(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['grabbed', 'remain'])
 
+        self.Z_publisher = rospy.Publisher('/agrolab/Y_to_Z_controller/command', Float64, queue_size = 100)
+        self.gripper_1_publisher = rospy.Publisher('/agrolab/gripper_controller/command', Float64, queue_size = 100)
+        self.gripper_2_publisher = rospy.Publisher('/agrolab/gripper_sub_controller/command', Float64, queue_size = 100)
+        self.absolute_moving = rospy.Publisher('/moving_regulator_node/absolute_moving', Point, queue_size = 100)
+
     def execute(self, userdata):
         global state_upd_time
         rospy.sleep(state_upd_time)
-        return 'remain'
+        self.gripper_1_publisher.publish(0.1)
+        self.gripper_2_publisher.publish(0.1)
+        rospy.sleep(0.5)
+        # msg = Point()
+        # msg.x = -1
+        # msg.y = -1
+        # msg.z = 0.2
+        # self.absolute_moving.publish(msg)
+        self.Z_publisher.publish(0.2)
+        rospy.sleep(1)
+        self.gripper_1_publisher.publish(0.0)
+        self.gripper_2_publisher.publish(0.0)
+        rospy.sleep(0.5)
+        # msg = Point()
+        # msg.x = -1
+        # msg.y = -1
+        # msg.z = 0.0
+        # self.absolute_moving.publish(msg)
+        self.Z_publisher.publish(0.0)
+        rospy.sleep(1)
+        # return 'remain'
         return 'grabbed'
 
 class MoveObjectState(smach.State):
@@ -136,11 +202,37 @@ class MoveObjectState(smach.State):
     
     def __init__(self):
         smach.State.__init__(self, outcomes=['arrive', 'remain'])
+        self.Z_publisher = rospy.Publisher('/agrolab/Y_to_Z_controller/command', Float64, queue_size = 100)
+        self.gripper_1_publisher = rospy.Publisher('/agrolab/gripper_controller/command', Float64, queue_size = 100)
+        self.gripper_2_publisher = rospy.Publisher('/agrolab/gripper_sub_controller/command', Float64, queue_size = 100)
+        self.absolute_moving = rospy.Publisher('/moving_regulator_node/absolute_moving', Point, queue_size = 100)
 
     def execute(self, userdata):
         global state_upd_time
         rospy.sleep(state_upd_time)
-        return 'remain'
+
+        msg = Point()
+        msg.x = 0.08
+        msg.y = 0.3175
+        msg.z = -1
+        self.absolute_moving.publish(msg)
+        rospy.sleep(3)
+
+        self.Z_publisher.publish(0.08)
+        rospy.sleep(1)
+
+        self.gripper_1_publisher.publish(0.1)
+        self.gripper_2_publisher.publish(0.1)
+        rospy.sleep(0.5)
+
+        self.Z_publisher.publish(0.0)
+        rospy.sleep(1)
+
+        self.gripper_1_publisher.publish(0.0)
+        self.gripper_2_publisher.publish(0.0)
+        rospy.sleep(1)
+        
+        # return 'remain'
         return 'arrive'
 
 class ReleaseState(smach.State):
@@ -153,7 +245,7 @@ class ReleaseState(smach.State):
     def execute(self, userdata):
         global state_upd_time
         rospy.sleep(state_upd_time)
-        return 'remain'
+        # return 'remain'
         return 'released'
 
 class ReturnHomeState(smach.State):
@@ -162,10 +254,19 @@ class ReturnHomeState(smach.State):
 
     def __init__(self):
         smach.State.__init__(self, outcomes=['homed', 'remain'])
+        self.absolute_moving = rospy.Publisher('/moving_regulator_node/absolute_moving', Point, queue_size = 100)
 
     def execute(self, userdata):
         global state_upd_time
         rospy.sleep(state_upd_time)
+
+        msg = Point()
+        msg.x = 0.08
+        msg.y = 0.3175
+        msg.z = -1
+        self.absolute_moving.publish(msg)
+        rospy.sleep(3)
+
         return 'remain'
         return 'homed'
 
@@ -181,20 +282,26 @@ def main():
     with sm:
 
         smach.StateMachine.add('Wait', WaitState(), transitions={'start':'Search',
-                                                                'remain': 'Wait'})
+                                                                    'remain': 'Wait'})
+
         smach.StateMachine.add('Search', SearchState(), transitions={'find_object':'GoToObject', 
-                                                                    'stop':'Wait',
-                                                                    'remain': 'Search'})
+                                                                        'stop':'Wait',
+                                                                        'remain': 'Search'})
+
         smach.StateMachine.add('GoToObject', GoToObjectState(), transitions={'arrive':'Grab',
-                                                                'remain': 'GoToObject'})
+                                                                                'remain': 'GoToObject'})
+
         smach.StateMachine.add('Grab', GrabState(), transitions={'grabbed':'MoveObject',
-                                                                'remain': 'Grab'})
+                                                                    'remain': 'Grab'})
+
         smach.StateMachine.add('MoveObject', MoveObjectState(), transitions={'arrive':'Release',
-                                                                            'remain': 'MoveObject'})
+                                                                                'remain': 'MoveObject'})
+                                                                            
         smach.StateMachine.add('Release', ReleaseState(), transitions={'released':'ReturnHome',
                                                                         'remain': 'Release'})
+
         smach.StateMachine.add('ReturnHome', ReturnHomeState(), transitions={'homed':'Search',
-                                                                            'remain': 'ReturnHome'})
+                                                                                'remain': 'ReturnHome'})
 
     # Визуализируем состояния
     sis = smach_ros.IntrospectionServer('agrolab', sm, '/SM_ROOT')

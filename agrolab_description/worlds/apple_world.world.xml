@@ -92,7 +92,7 @@
       <pose>-0.26885 -0.1322 0.1 0 -0 0</pose>
       <link name='link'>
         <inertial>
-          <mass>1</mass>
+          <mass>0.0001</mass>
           <inertia>
             <ixx>0.1</ixx>
             <ixy>0</ixy>
